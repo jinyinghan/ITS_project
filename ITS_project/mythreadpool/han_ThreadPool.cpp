@@ -16,19 +16,19 @@ namespace ITS
 {
     ThreadPool::ThreadPool(int threadNum)
     {
-        threadNum = threadNum;
-        //isRunning = true;
+        threadsNum_ = threadNum;
+        //isRunning_ = true;
     }
 
-    void ThreadPool::Start()
+    void ThreadPool::start()
     {
-        CreateThreads();
-        isRunning = true;
+        createThreads();
+        isRunning_ = true;
     }
 
     ThreadPool::~ThreadPool()
     {
-        Stop();
+        stop();
         for(std::deque<Task*>::iterator it = taskQueue_.begin();
                 it !=taskQueue_.end();
                 ++it)
@@ -38,7 +38,7 @@ namespace ITS
         taskQueue_.clear();
     }
 
-    int ThreadPool::CreateThreads()
+    int ThreadPool::createThreads()
     {
         pthread_mutex_init(&mutex_,NULL);
         pthread_cond_init(&condition_,NULL);
@@ -47,7 +47,7 @@ namespace ITS
         {
             pthread_create(&threads_[i],NULL,threadFunc,this);
         }
-        reutrn 0;
+        return 0;
     }
     
     size_t ThreadPool::addTask(Task *task)
@@ -61,7 +61,7 @@ namespace ITS
         return size;
     }
 
-    void ThreadPool::Stop( ) 
+    void ThreadPool::stop( ) 
     {
        if(!isRunning_)
        {
@@ -123,8 +123,8 @@ namespace ITS
     void* ThreadPool::threadFunc(void* arg)
     {
         pthread_t tid = pthread_self();
-        ThreadPool* pool = static_cast<ThreasdPool*>(arg);
-        whild(pool->isRunning_)
+        ThreadPool* pool = static_cast<ThreadPool*>(arg);
+        while(pool->isRunning_)
         {
             Task* task = pool->take();
             if(!task)
@@ -133,7 +133,7 @@ namespace ITS
                 break;
             }
 
-            assertj(task);
+            assert(task);
             task->run();
         }
         return 0;

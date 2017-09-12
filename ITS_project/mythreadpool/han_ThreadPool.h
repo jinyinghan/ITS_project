@@ -1,4 +1,4 @@
-#ifdef HAN_THREADPOOL_H
+#ifndef HAN_THREADPOOL_H
 #define HAN_THREADPOOL_H
 
 
@@ -12,6 +12,7 @@
 
 #include <deque>
 #include <string.h>
+#include <string>
 #include <pthread.h>
 #include <stdlib.h>
 
@@ -49,9 +50,9 @@ namespace ITS
             ~ThreadPool();
     
             size_t addTask(Task* task);
-            void    Stop();
+            void    stop();
             int     size();
-            void    Start();
+            void    start();
             Task*   take();
                             
         protected:
@@ -67,7 +68,7 @@ namespace ITS
             int threadsNum_;
             pthread_t* threads_;
             
-            std::dequeue<Task*> taskQueue_;
+            std::deque<Task*> taskQueue_;
             pthread_mutex_t mutex_;
             pthread_cond_t condition_;
 
