@@ -1,11 +1,44 @@
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+using namespace std;
 
 #define LINE 10
 
 
 void print_in_middle(WINDOW* win,int starty,int startx,int width,char* string);
+
+void* EWStraight_refresh(void* arg);
+void* EWTurnleft_refresh(void* arg);
+void* NSStraight_refresh(void* arg);
+void* NSTurnleft_refresh(void* arg);
+
+void* head_refresh(void* arg);
+void* background_refresh(void* arg);
+void* middle_num(void* arg);
+
+class window
+{
+    friend void* ewstraight_refresh(void* arg);
+    friend void* ewturnleft_refresh(void* arg);
+    friend void* nsstraight_refresh(void* arg);
+    friend void* nsturnleft_refresh(void* arg);
+
+    friend void* head_refresh(void* arg);
+    friend void* background_refresh(void* arg);
+    friend void* middle_num(void* arg);
+    
+    public:
+    window()
+    {
+        initser();
+
+        getmaxyx(stdscr.y,x);
+    }
+};
+
+
 
 int main()
 {
