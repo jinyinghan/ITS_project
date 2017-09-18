@@ -1,5 +1,3 @@
-/*from dodng
-2016.12.9*/
 #include <stdio.h>
 #include "ring_queue.h" 
 #include <unistd.h>
@@ -74,7 +72,7 @@ void *producer(void *arg)
 
 int main(int argc,char *argv[])
 {
-	pthread_t tid_customer[THREAD_NUM];
+	thread_t tid_customer[THREAD_NUM];
 	pthread_t tid_producer[THREAD_NUM];
 	Ring_Queue *queue = new Ring_Queue[THREAD_NUM](LOOP_SIZE,sizeof(DATA_TYPE));
 
