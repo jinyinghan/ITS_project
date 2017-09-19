@@ -1,0 +1,54 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CAN_READ	ring_queue.h	13;"	d
+CAN_WRITE	ring_queue.h	12;"	d
+DATA_TYPE	itsc_main.cpp	16;"	d	file:
+LOOP_SIZE	itsc_main.cpp	/^const int LOOP_SIZE = 1024;$/;"	v
+Lets_Config	itsc_main.cpp	/^        Lets_Config()$/;"	f	class:Lets_Config
+Lets_Config	itsc_main.cpp	/^class Lets_Config : public Thread$/;"	c	file:
+Logic_Execute	itsc_main.cpp	/^        Logic_Execute()$/;"	f	class:Logic_Execute
+Logic_Execute	itsc_main.cpp	/^class Logic_Execute : public Thread$/;"	c	file:
+READING	ring_queue.h	14;"	d
+ReadQ	ring_queue.cpp	/^Ring_Queue::ReadQ()$/;"	f	class:Ring_Queue
+Read_Over	ring_queue.cpp	/^Ring_Queue::Read_Over()$/;"	f	class:Ring_Queue
+Ring_Queue	ring_queue.h	/^        Ring_Queue(int nmemb,int size):_nmemb(nmemb),_size(size),_read_now(0),_write_now(0)$/;"	f	class:Ring_Queue
+Ring_Queue	ring_queue.h	/^class Ring_Queue$/;"	c
+TAG	ring_queue.h	/^}TAG;$/;"	t	typeref:struct:tag
+Thread	capsulation_thread.h	/^class Thread$/;"	c
+WRITING	ring_queue.h	15;"	d
+WriteQ	ring_queue.cpp	/^Ring_Queue::WriteQ()$/;"	f	class:Ring_Queue
+Write_Over	ring_queue.cpp	/^Ring_Queue::Write_Over()$/;"	f	class:Ring_Queue
+__CAPSULATION_THREAD_H__	capsulation_thread.h	2;"	d
+__RING_QUEUE_H__	ring_queue.h	8;"	d
+_nmemb	ring_queue.h	/^        int     _nmemb;$/;"	m	class:Ring_Queue
+_queue_p	ring_queue.h	/^        u_char* _queue_p;$/;"	m	class:Ring_Queue
+_read_now	ring_queue.h	/^        volatile int _read_now;$/;"	m	class:Ring_Queue
+_size	ring_queue.h	/^        int     _size;$/;"	m	class:Ring_Queue
+_write_now	ring_queue.h	/^        volatile int _write_now;$/;"	m	class:Ring_Queue
+bExit_	capsulation_thread.h	/^        bool    bExit_;$/;"	m	class:Thread
+check_interrupt	capsulation_thread.h	/^        bool check_interrupt()$/;"	f	class:Thread
+cond_	capsulation_thread.h	/^        Condition       cond_;$/;"	m	class:Thread
+destroy	capsulation_thread.cpp	/^void Thread::destroy()$/;"	f	class:Thread
+get_thread_id	capsulation_thread.h	/^        int get_thread_id()$/;"	f	class:Thread
+join	capsulation_thread.cpp	/^int Thread::join()$/;"	f	class:Thread
+logic_run	itsc_main.cpp	/^void* logic_run(void* arg)$/;"	f
+loop_	itsc_main.cpp	/^        bool loop_;$/;"	m	class:Lets_Config	file:
+loop_	itsc_main.cpp	/^        bool loop_;$/;"	m	class:Logic_Execute	file:
+main	itsc_main.cpp	/^int main (int argc,char* argv[])$/;"	f
+notify	capsulation_thread.h	/^        void notify()$/;"	f	class:Thread
+queue_peek_nth	ring_queue.cpp	/^Ring_Queue::queue_peek_nth(u_char* queue_p,int pos)$/;"	f	class:Ring_Queue
+run	itsc_main.cpp	/^        virtual void run()$/;"	f	class:Lets_Config
+run	itsc_main.cpp	/^        virtual void run()$/;"	f	class:Logic_Execute
+set_thread_id	capsulation_thread.h	/^        void set_thread_id(unsigned long thrId)$/;"	f	class:Thread
+start	capsulation_thread.cpp	/^Thread::start()$/;"	f	class:Thread
+tag	ring_queue.h	/^typedef struct tag$/;"	s
+tag_value	ring_queue.h	/^    u_char tag_value;$/;"	m	struct:tag
+thr_	capsulation_thread.h	/^        apr_thread_t*   thr_;$/;"	m	class:Thread
+thr_id_	capsulation_thread.h	/^        size_t  thr_id_;$/;"	m	class:Thread
+thread_proc	capsulation_thread.cpp	/^void* Thread::thread_proc(apr_thread_t* th,void* data)$/;"	f	class:Thread
+u_char	ring_queue.h	/^typedef unsigned char u_char;$/;"	t
+~Ring_Queue	ring_queue.h	/^        ~Ring_Queue()$/;"	f	class:Ring_Queue

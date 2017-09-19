@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <pthread.h>
+#include "./condition.h"
 #include "/opt/apr/include/apr-1/apr_thread_proc.h"
 
 class Thread
