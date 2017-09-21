@@ -1,5 +1,5 @@
 
-#include "Thread.h"
+#include "thread.h"
 #include "MutexLock.h"
 #include "Condition.h"
 #include  <vector>

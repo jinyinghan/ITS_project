@@ -1,7 +1,7 @@
 #ifndef __THREAD_H__
 #define __THREAD_H__
 #include <iostream>
-#include <boost/noncopyable.hpp>
+#include </opt/boost_1_65_1/boost/noncopyable.hpp>
 #include <pthread.h>
 #include "MutexLock.h"
 #include "Condition.h"

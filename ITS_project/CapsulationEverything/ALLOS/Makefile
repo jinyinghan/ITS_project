@@ -2,19 +2,19 @@ OBJS = Test.o allosthread.o ThreadMutex.o
 
 CC = g++
 
-CFLAGS = -Wall -O -g
+CFLAGS = -g -Wall -O 
 
-test:$(OBJS)
-	$(cc)$(OBJS) -p test -lpthread 
+Test:$(OBJS)
+	$(CC) $(OBJS) -p -o Test -lpthread 
 allosthread.o:allosthread.cpp allosthread.h
-	$(cc)$(CFLAGS) -c allosthread.cpp
+	$(CC) $(CFLAGS) -c allosthread.cpp
 ThreadMutex.o:ThreadMutex.cpp ThreadMutex.h
-	$(cc)$(CFLAGS) -c ThreadMutex.cpp
+	$(CC) $(CFLAGS) -c ThreadMutex.cpp
 Test.o:Test.cpp allosthread.h ThreadMutex.h
-	$(cc)$(CFLAGS) -c Test.cpp
+	$(CC) $(CFLAGS) -c Test.cpp
 
 clean:
-	rm -rf *.o test
+	rm -rf *.o Test
 
 
 
