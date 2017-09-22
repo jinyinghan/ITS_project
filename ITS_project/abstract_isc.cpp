@@ -1,8 +1,16 @@
+/**********************************************
+*Project:main for ITS
+*Author:GenieHan
+*Email:hahahaha-oooo@163.com
+*Date:2017/09
+***********************************************/
 #include <vector>
 #include <stack>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <string>
+#include "Linklist.h"
 using namespace std;
 
 
@@ -17,63 +25,127 @@ typedef int        int32_t;
 class Crossing
 {
     public:
-        Crossing(uint8_t directionNumb):      m_directionNumb(directionNumb)
+        Crossing(uint8_t directionNumb)
         {
+            m_directionNumb = directionNumb;
+            m_scheme = 1;
             printf("cross have %d\n",m_directionNumb);
-
         }
         Crossing()
         {
             m_directionNumb = 4 ;
-            printf("cross have %d\n",m_directionNumb);
+            m_scheme = 1;
+            printf("cross use %d\n",m_scheme);
         }
+#if 0
         ~Crossing()
-        {
+      {
             printf("this crossing is died\n");
         }
-
+#endif
+        uint8_t GetDirNumb()
+        {
+            return m_directionNumb;
+        }
+        uint8_t GetScheme()
+        {
+            return m_scheme;
+        }
+        virtual uint8_t setScheme(uint8_t) = 0;
         uint8_t m_directionNumb;
+        uint8_t m_scheme;
 };
 
-class Traffic_Chanel
+class Chanel:public Crossing
 {
-public:
-    uint8_t m_ChAttribute;
-    uint8_t m_ChStatus;
-    string name;
-    Traffic_Chanel();
-    Traffic_Chanel(string n)
-    {
-        name = n;
-        printf("this Chanel start\n");
-    }
-    ~Traffic_Chanel()
+    public:
+        /* uint8_t m_ChAttribute; */
+        uint8_t m_chanelNumb;
+        uint8_t m_chStatus;
+        Chanel(uint8_t chanelNumb,uint8_t directionNumb):Crossing(directionNumb)
+        {
+            m_chanelNumb = chanelNumb;
+            printf("this Chanel start\n");
+        }
+        Chanel():Crossing()
+        {
+            m_chanelNumb = 8;
+        }
+        uint8_t setScheme(uint8_t newScheme)
+        {
+            m_scheme = newScheme;
+            
+        }
+        enum ChAttribute{ns=0,nl,es,el,ss,sl,ws,wl}m_chId ;
+
+        
+
+#if 0
+    ~Chanel()
     {
             printf("this Chanel died~\n");
     }
-    void set(uint8_t Attribute,uint8_t Status )
+    void config_set(uint8_t Attribute )
     {
         m_ChAttribute = Attribute;
-        m_ChStatus = Status;
-        
-
     }
-#if 0
-    enum RYG {red,gree,yello} color;
+    enum RYG {red=1,gree,yello} color;
     enum CSG {brighten,shine,close} status;
     vector<uint8_t *> sequence; 
+    virtual uint8_t  *action();
 #endif
-
-  virtual uint8_t  *action();
-
+   
+};
+struct LightMode
+{
+    uint8_t LModeNub;
+    LinkList LModeObj;
+};
+class Traffic_Light 
+{
+    public:
+        uint8_t tTime;//交通灯状态心跳
+        LightMode defaultLM;
+        LightMode nowLM;
+        Traffic_Light()
+        {
+            defaultLM.LModeNub = 0;
+    Info val1,val2,val3,val4;  
+    val1.id = 1,
+    val1.name = Info::close,
+    val1.dTime = 3,
     
+    val2.id = 2,
+    val2.name = Info::red,
+    val2.dTime = 4,
+    
+    val3.id = 3,
+    val3.name = Info::green,
+    val3.dTime = 5,
+    
+    val4.id = 4,
+    val4.name = Info::yellow,
+    val4.dTime = 2;  
+
+//    测试插入功能  
+      printf("Insert test:\n"); 
+ defaultLM.LModeObj.InsertHead(val1);  
+ defaultLM.LModeObj.Insert(val3,1);  
+  defaultLM.LModeObj.Insert(val4,2);  
+    defaultLM.LModeObj.Insert(val2,3);  
+   defaultLM.LModeObj.Insert(val4,4);  
+            
+        }
+        bool create_lightMode(LightMode newLM)
+        {
+
+        }
 };
 
-class Base_Phase:public Traffic_Chanel
+class Base_Phase:public Crossing
 {
     public:
         uint8_t m_phID;
-        Base_Phase(uint8_t ID,string name):    Traffic_Chanel(name){m_phID = ID;};
         uint8_t* action()
         {
             printf("I will create ringqueue in Base_phase~\n");
@@ -134,13 +206,11 @@ class Base_traffic
 
 int main()
 {
-    Base_Phase* p = new Base_Phase(12,"aaa");
+    Chanel* p = new Chanel(8,4);
     if(p != NULL)
     {
         printf("error");
     }
-    p -> action();
-    p ->set(11,12);
     delete p;
     
 }
