@@ -15,7 +15,7 @@ int main()
     setTicker(200);
     while(1)
     {
-        signal(SIGALRM, show);
+        /* signal(SIGALRM, show); */
 
     }
 }

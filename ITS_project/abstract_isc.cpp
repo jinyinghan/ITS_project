@@ -107,37 +107,64 @@ class Traffic_Light
         uint8_t tTime;//交通灯状态心跳
         LightMode defaultLM;
         LightMode nowLM;
+        uint8_t maxLMNumb;
         Traffic_Light()
         {
             defaultLM.LModeNub = 0;
-    Info val1,val2,val3,val4;  
-    val1.id = 1,
-    val1.name = Info::close,
-    val1.dTime = 3,
-    
-    val2.id = 2,
-    val2.name = Info::red,
-    val2.dTime = 4,
-    
-    val3.id = 3,
-    val3.name = Info::green,
-    val3.dTime = 5,
-    
-    val4.id = 4,
-    val4.name = Info::yellow,
-    val4.dTime = 2;  
+            Info val1,val2,val3,val4;  
+            val1.id = 1,
+                val1.name = Info::close,
+                val1.dTime = 3,
 
-//    测试插入功能  
-      printf("Insert test:\n"); 
- defaultLM.LModeObj.InsertHead(val1);  
- defaultLM.LModeObj.Insert(val3,1);  
-  defaultLM.LModeObj.Insert(val4,2);  
-    defaultLM.LModeObj.Insert(val2,3);  
-   defaultLM.LModeObj.Insert(val4,4);  
-            
+                val2.id = 2,
+                val2.name = Info::red,
+                val2.dTime = 4,
+
+                val3.id = 3,
+                val3.name = Info::green,
+                val3.dTime = 5,
+
+                val4.id = 4,
+                val4.name = Info::yellow,
+                val4.dTime = 2;  
+
+            //    测试插入功能  
+            printf("Insert test:\n"); 
+            defaultLM.LModeObj.InsertHead(val1);  
+            defaultLM.LModeObj.Insert(val3,1);  
+            defaultLM.LModeObj.Insert(val4,2);  
+            defaultLM.LModeObj.Insert(val2,3);  
+            defaultLM.LModeObj.Insert(val4,4);  
+
         }
-        bool create_lightMode(LightMode newLM)
+        bool create_lightMode(uint8_t LMNub,LightMode newLM)
         {
+
+            nowLM.LModeNub = LMNub;
+            Info val1,val2,val3,val4;  
+            val1.id = 1,
+                val1.name = Info::close,
+                val1.dTime = 0,
+
+                val2.id = 2,
+                val2.name = Info::red,
+                val2.dTime = 6,
+
+                val3.id = 3,
+                val3.name = Info::green,
+                val3.dTime = 8,
+
+                val4.id = 4,
+                val4.name = Info::yellow,
+                val4.dTime = 2;  
+
+            //    测试插入功能  
+            printf("Insert test:\n"); 
+            nowLM.LModeObj.InsertHead(val1);  
+            nowLM.LModeObj.Insert(val3,1);  
+            nowLM.LModeObj.Insert(val4,2);  
+            nowLM.LModeObj.Insert(val2,3);  
+            nowLM.LModeObj.Insert(val4,4);  
 
         }
 };

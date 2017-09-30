@@ -118,27 +118,28 @@ int main()
 {
 	
 	ITS_window win;
-    /* win.create_head(); */
-    /* win.create_background(); */
+    win.create_head();
+    win.create_background();
     win.create_middleNub();
     /* cbreak();                    //把终端的CBREAK模式打开 */
-    noecho();                    //关闭回显
+    /* noecho();                    //关闭回显 */
     curs_set(0);                //把光标置为不可见
-    keypad(stdscr, true);        //使用用户终端的键盘上的小键盘
+    /* keypad(stdscr, true);        //使用用户终端的键盘上的小键盘 */
     hour = minute = second = tTime = 0;
-    setTicker(20);
-    signal(SIGALRM, show);
+    /* setTicker(20); */
+    /* signal(SIGALRM, show); */
     while(1)
     {
-        ch = getch();
+        /* sleep(1); */
+        ch = getch(); 
         head_refresh((void*)&win);
         background_refresh((void*)&win);
         /* refresh();     */
-        if(KEY_LEFT == ch)
-        {
+        /* if(KEY_LEFT == ch) */
+        /* { */
             middleNub_refresh((void*)&win);
-        }
-        setTicker(20);
+        /* } */
+        /* setTicker(20); */
     }
 //	return 0;
 }
@@ -191,7 +192,7 @@ void showInformation()
 
 void show()
 {
-    signal(SIGALRM, show);        //设置中断信号
+    /* signal(SIGALRM, show);        //设置中断信号 */
     showInformation();
     refresh();                    //刷新真实屏幕
 }
