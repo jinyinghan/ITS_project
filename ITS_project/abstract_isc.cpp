@@ -164,7 +164,21 @@ class Traffic_Light
             nowLM.LModeObj.Insert(val3,1);  
             nowLM.LModeObj.Insert(val4,2);  
             nowLM.LModeObj.Insert(val2,3);  
-            nowLM.LModeObj.Insert(val4,4);  
+            defaulting namespace std;
+            class Phase
+            {
+                public :
+                    uint8_t m_phID;
+                    void action()
+                    {
+                        //强制绿->红之间的过度黄灯
+                        //}
+                        //string m_desc;
+                        //uint8_t m_GS;
+                        //uint8_t m_YT;
+                        //uint8_t m_bindChannel;
+                        //}
+                        //M.LModeObj.Insert(val4,4);  
 
         }
 };
