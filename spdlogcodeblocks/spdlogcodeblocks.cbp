@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="spdlogcodeblocks" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/spdlogcodeblocks" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="obj/Debug/" />
+				<Option type="5" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="pthread" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/spdlogcodeblocks" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="../spdtest/include/spdlog/async_logger.h" />
+		<Unit filename="../spdtest/include/spdlog/common.h" />
+		<Unit filename="../spdtest/include/spdlog/details/async_log_helper.h" />
+		<Unit filename="../spdtest/include/spdlog/details/async_logger_impl.h" />
+		<Unit filename="../spdtest/include/spdlog/details/file_helper.h" />
+		<Unit filename="../spdtest/include/spdlog/details/log_msg.h" />
+		<Unit filename="../spdtest/include/spdlog/details/logger_impl.h" />
+		<Unit filename="../spdtest/include/spdlog/details/mpmc_bounded_q.h" />
+		<Unit filename="../spdtest/include/spdlog/details/null_mutex.h" />
+		<Unit filename="../spdtest/include/spdlog/details/os.h" />
+		<Unit filename="../spdtest/include/spdlog/details/pattern_formatter_impl.h" />
+		<Unit filename="../spdtest/include/spdlog/details/registry.h" />
+		<Unit filename="../spdtest/include/spdlog/details/spdlog_impl.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/bundled/format.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/bundled/ostream.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/bundled/posix.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/bundled/printf.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/bundled/time.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/fmt.h" />
+		<Unit filename="../spdtest/include/spdlog/fmt/ostr.h" />
+		<Unit filename="../spdtest/include/spdlog/formatter.h" />
+		<Unit filename="../spdtest/include/spdlog/logger.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/android_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/ansicolor_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/base_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/dist_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/file_sinks.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/msvc_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/null_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/ostream_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/stdout_sinks.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/syslog_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/wincolor_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/sinks/windebug_sink.h" />
+		<Unit filename="../spdtest/include/spdlog/spdlog.h" />
+		<Unit filename="../spdtest/include/spdlog/tweakme.h" />
+		<Unit filename="han_ThreadPool.cpp" />
+		<Unit filename="han_ThreadPool.h" />
+		<Unit filename="log.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
