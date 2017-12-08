@@ -24,7 +24,7 @@ class Mytask : public ITS::Task
 		WARN("hurry","thread [{}] : {}",pthread_self(),(char*) this->arg_);
 		ERR("hurry","thread [{}] : {}",pthread_self(),(char*) this->arg_);
 		FATAL("hurry","thread{} : {}",pthread_self(),(char*) this->arg_);
-		hik::ItsWriteFaultLog(1,2);
+		hik::errorLog::ItsWriteFaultLog(1,2);
 
             sleep(1);
             return 0;

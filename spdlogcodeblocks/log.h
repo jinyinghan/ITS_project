@@ -63,19 +63,92 @@ namespace hik
 	typedef struct faultLogHead
 	{
 		unsigned int num;
-		FaultLogInfo data[0];
+		FaultLogInfo data[4];
 	} FaultLogHead;
 
 	struct msgbuf
 	{
 		unsigned int msgflag;
 		unsigned int nNumber;	//序列号
-		unsigned int nType;	//故障类型ID,对应于枚举FaultLogType
-		unsigned int nTime;	//故障发生时间
+		unsigned int nType;	    //故障类型ID,对应于枚举FaultLogType
+		unsigned int nTime; 	//故障发生时间
 		unsigned int nValue;	//故障附带值
     };
 
-	void *FaultLogModule(void *arg)
+
+
+
+	class errorLog
+	{
+		public:
+		errorLog()
+		{
+			pthread_t errorLog_pid;
+			if (pthread_create(&errorLog_pid, NULL, FaultLogModule, NULL) == -1)
+			{
+				/* log_error("create %s module fail, error info:%s\n", info->moduleName, strerror(errno)); */
+//				ERR("create module fail, error info:{}", /*info->moduleName, */strerror(errno));
+				exit(1);
+			}
+			pthread_detach(0);
+
+		}
+
+        static void ItsWriteFaultLog(unsigned int type,unsigned int value)//(FaultLogType type, int value)
+        {
+
+            struct msgbuf msg;
+            msg.msgflag = WRITE_FAULT_LOG;
+            msg.nType   = type;
+            msg.nTime   = time(NULL);
+            msg.nValue  = value;
+            msg.nNumber = _nNumber;	//序列号
+            _nNumber++;
+            if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
+            {
+//			log_error("send write fault log msg fail, errno info: %s", strerror(errno));
+//          ERR("send write fault log msg fail, errno info: {}", strerror(errno));
+            }
+        }
+
+std::vector<FaultLogInfo> ItsReadFaultLog(const time_t startTM, const time_t endTM)
+{
+
+
+    FaultLogInfo get;
+    get.nTime = startTM;
+
+    std::vector<FaultLogInfo> rlt;
+//    rlt.push(get);
+
+/*
+	struct msgbuf msg;
+	FaultLogInfo zero;	//表明上载故障日志出错，默认应答回复1个空的故障日志
+
+	if (netArg == NULL || func == NULL)
+		return;
+	if (netArgSize > MSGSIZE - sizeof(struct faultLogMsg))
+	{
+		ERR("network arguments size exceed msg space");
+		memset(&zero, 0, sizeof(FaultLogInfo));
+		func(netArg, &zero, sizeof(FaultLogInfo));
+	}
+	else
+	{
+		memset(&msg, 0, sizeof(msg));
+		msg.mtype = MSG_FAULT_LOG;
+		msg.msgFLrwflag = READ_FAULT_LOG;
+		msg.msgFLstartLine = startLine;
+		msg.msgFLlineNum = lineNum;
+		msg.msgFLfunc = func;
+		memcpy(msg.msgFLnetArg, netArg, netArgSize);
+		if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
+			log_error("send read fault log msg fail, errno info: %s", strerror(errno));
+	}
+
+}
+*/
+	static void *FaultLogModule(void *arg)
 	{
 		struct msgbuf msg;
 		/* struct FaultLogInfo msg; */
@@ -122,16 +195,16 @@ namespace hik
 			if (msg.msgflag == WRITE_FAULT_LOG)
 			{
 
-				if (head->num+ 1 > FAULT_LOG_MAX_NUM)
-				)					{head->num = 0;	}//写到文件末尾了重头覆盖
-				info = head->data + head->num;
-				info->nNumber = head->num + 1;
+				if(( (head->num)+ 1) > FAULT_LOG_MAX_NUM)
+					)				{head->num = 0;	}//写到文件末尾了重头覆盖
+//				info = head->data + head->num;
+				info->nNumber = msg.nNumber;
 				info->nType = msg.nType;
 				info->nTime = msg.nTime;
 				info->nValue = msg.nValue;
 				head->num++;
 				msync(info, sizeof(FaultLogInfo), MS_ASYNC);//内存与文件同步
-				msync(head, sizeof(head->num), MS_ASYNC);
+//				msync(head, sizeof(head->num), MS_ASYNC);
 			}
 			else if (msg.msgflag == READ_FAULT_LOG)
             {
@@ -143,92 +216,14 @@ namespace hik
 			}
 		}
 	}
-
-	void ItsWriteFaultLog(unsigned int type,unsigned int value)//(FaultLogType type, int value)
-	{
-		struct msgbuf msg;
-		msg.msgflag = WRITE_FAULT_LOG;
-		msg.nType = type;
-		msg.nTime = time(NULL);
-		msg.nValue = value;
-		if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
-		{
-//				log_error("send write fault log msg fail, errno info: %s", strerror(errno));
-//            ERR("send write fault log msg fail, errno info: {}", strerror(errno));
-		}
-	}
-std::vector<FaultLogInfo> ItsReadFaultLog(const time_t startTM, const time_t endTM)
-{
-
-    std::int n[4];
-    std::long size;
-    std::ifstream infile(FAULT_LOG_FILE, ios::in|ios::binary|ios::ate);
-    if(!infile.is_open())
-    {
- //       cerr << "error:unable to open input file:" << infile << endl;
- //       return -1;
-    }
-    size = infile.tellg();
-    infile.seekg (0, ios::beg);
-    while(!infile.eof())
-    {
-      infile.read((unsigned char*)n,sizeof(n));
-      infile.seekp(16,ios::cur);
-    }
-
-    FaultLogInfo get;
-    get.nTime = n
-    std::vector<FaultLogInfo> rlt;
-//    rlt.push(get);
-
-/*
-	struct msgbuf msg;
-	FaultLogInfo zero;	//表明上载故障日志出错，默认应答回复1个空的故障日志
-
-	if (netArg == NULL || func == NULL)
-		return;
-	if (netArgSize > MSGSIZE - sizeof(struct faultLogMsg))
-	{
-		ERR("network arguments size exceed msg space");
-		memset(&zero, 0, sizeof(FaultLogInfo));
-		func(netArg, &zero, sizeof(FaultLogInfo));
-	}
-	else
-	{
-		memset(&msg, 0, sizeof(msg));
-		msg.mtype = MSG_FAULT_LOG;
-		msg.msgFLrwflag = READ_FAULT_LOG;
-		msg.msgFLstartLine = startLine;
-		msg.msgFLlineNum = lineNum;
-		msg.msgFLfunc = func;
-		memcpy(msg.msgFLnetArg, netArg, netArgSize);
-		if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
-			log_error("send read fault log msg fail, errno info: %s", strerror(errno));
-	}
-*/
-}
-
-	class errorLog
-	{
-		public:
-		errorLog()
-		{
-			pthread_t errorLog_pid;
-			if (pthread_create(&errorLog_pid, NULL, FaultLogModule, NULL) == -1)
-			{
-				/* log_error("create %s module fail, error info:%s\n", info->moduleName, strerror(errno)); */
-//				ERR("create module fail, error info:{}", /*info->moduleName, */strerror(errno));
-				exit(1);
-			}
-			pthread_detach(0);
-
-		}
-
 		/* void write(event_enum eventkey, const int value); */
 
 		//std::vector<FaultLog> read(const time_t start, const time_t end);
 		//string read(const time_t start, const time_t end);//查询指定日期范围内的小日志记录.
+
+        static unsigned int _nNumber;//序列号
 	};
+    unsigned int errorLog::_nNumber;
 
 	class log
 	{
