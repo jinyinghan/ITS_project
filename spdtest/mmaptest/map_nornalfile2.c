@@ -24,7 +24,7 @@ int main()
     printf("startTM = %d\n",startTM);
    fd = open("./testmmap.txt",O_CREAT|O_RDWR,00777);
    p_head = (FaultLogInfo*)mmap(NULL,sizeof(FaultLogInfo)*10,PROT_READ|PROT_WRITE,MAP_SHARED,fd,0);
-   for(i=0;i<10;i++)
+   for(i=0;i<14;i++)
    {
        printf("seq:%d,nTime:%d,key:%d,value:%d\n",(*(p_head+i)).seq,(*(p_head+i)).nTime,(*(p_head+i)).key,(*(p_head+i)).value);
         if(((*(p_head+i)).nTime) <= startTM)
@@ -36,7 +36,12 @@ int main()
        printf("push [[ seq:%d,nTime:%d,key:%d,value:%d ]]\n",(*(p_head+i)).seq,(*(p_head+i)).nTime,(*(p_head+i)).key,(*(p_head+i)).value);
         rlt.push_back(get);
         }
+if((*(p_head+i)).seq == 0  )
+{
+	printf("phead == NULL,%d\n",i);
+}
    }
+
     munmap(p_head,sizeof(FaultLogInfo)*10);
     return 0;
 }

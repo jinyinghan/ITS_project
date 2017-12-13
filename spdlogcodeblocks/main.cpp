@@ -25,22 +25,32 @@ class Mytask : public ITS::Task
 		ERR("hurry","thread [{}] : {}",pthread_self(),(char*) this->arg_);
 		FATAL("hurry","thread{} : {}",pthread_self(),(char*) this->arg_);
 		hik::errorLog::ItsWriteFaultLog(1,2);
+		vector <hik::FaultLogInfo> vecTemp;
+		time_t walla = time(NULL);
+		bool res = hik::errorLog::ItsReadFaultLog(walla,walla,vecTemp);
+//		INFO("uuu","res =  [{}] ",res);
 
             sleep(1);
             return 0;
         }
 };
+
 int main()
 {
 
 cout<<"coming..."<<endl;
     hik::errorLog log1;
-
-    hik::log log2;
+    LOG_INIT("file_logger", "daily", 0, 1);
+//    hik::log log2;
 //    log2.initlog();
     int i=0;
     string s = "hi,diss";
     char szTmp[] = "this is my ITS threadpool test";
+    pthread_t testpthread;
+    vector <hik::FaultLogInfo> vecTemp;
+    time_t walla = time(NULL);
+    bool res;
+
 	for(i=0;i<10;i++)
 	{
 		TRACE("hurry","{}",s);
@@ -49,8 +59,8 @@ cout<<"coming..."<<endl;
 		WARN("hurry","{}",s);
 		ERR("hurry","{}",s);
 		FATAL("hurry","{}",s);
-
 	}
+
 
 	Mytask taskobj;
     taskobj.setArg((void*)szTmp);

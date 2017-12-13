@@ -75,6 +75,7 @@
 		<Unit filename="../spdtest/include/spdlog/tweakme.h" />
 		<Unit filename="han_ThreadPool.cpp" />
 		<Unit filename="han_ThreadPool.h" />
+		<Unit filename="log.cpp" />
 		<Unit filename="log.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>

@@ -16,6 +16,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <vector>
+//#include <iostream>
+//#include <exception>
 
 #include "../spdtest/include/spdlog/spdlog.h"
 #include "../spdtest/include/spdlog/sinks/msvc_sink.h"
@@ -30,17 +32,23 @@
 
 #define FAULT_LOG_FILE		"./faultlog.dat"
 #define FAULT_LOG_MAX_SIZE	262144	//256k
-#define FAULT_LOG_MAX_NUM	(FAULT_LOG_MAX_SIZE / sizeof(FaultLogInfo)
-#define MSGSIZE (sizeof(struct msgbuf) - sizeof(long))
+#define FAULT_LOG_MAX_NUM	(FAULT_LOG_MAX_SIZE / sizeof(FaultLogInfo))
+#define MSGSIZE (sizeof(struct msgbuf))
 #define MSG_FAULT_LOG   3
 #define READ_FAULT_LOG	1
 #define WRITE_FAULT_LOG	2
 #define CLEAR_FAULT_LOG	3
+#define LOG_INIT(logger_name, file_name, hour,minute) \
+    do \
+    { \
+        hik::log::loggerfile()->init(logger_name, file_name, hour,minute); \
+    } while (0)
+
 /* #pragma comment(lib,"pthreadVC2.lib")  */
 
 namespace hik
 {
-    static int msgid = -1;
+    int msgid = -1;
 	typedef enum
 	{
 		trace = 0,
@@ -55,165 +63,173 @@ namespace hik
 	typedef struct _fault_log_info
 	{
 		unsigned int nNumber;	//序列号
-		unsigned int nType;	//故障类型ID,对应于枚举FaultLogType
-		unsigned int nTime;	//故障发生时间
+		unsigned int nTime;	    //故障发生时间
+		unsigned int nType;	    //故障类型ID,对应于枚举FaultLogType
 		unsigned int nValue;	//故障附带值
 	}FaultLogInfo ;
-
-	typedef struct faultLogHead
+	typedef struct _fault_log_head
 	{
-		unsigned int num;
-		FaultLogInfo data[4];
-	} FaultLogHead;
+        unsigned int nowSeq;
+        unsigned int refreshNub;
+        unsigned int tmp1;
+        unsigned int tmp2;
+	}FaultLogHead;
 
 	struct msgbuf
 	{
 		unsigned int msgflag;
 		unsigned int nNumber;	//序列号
+		unsigned int nTime;	    //故障发生时间
 		unsigned int nType;	    //故障类型ID,对应于枚举FaultLogType
-		unsigned int nTime; 	//故障发生时间
 		unsigned int nValue;	//故障附带值
     };
 
-
-
-
 	class errorLog
 	{
+
 		public:
+        pthread_t errorLog_pid;
+        static unsigned int _nextSeq ;
+        static FaultLogInfo *pMap ;
 		errorLog()
 		{
-			pthread_t errorLog_pid;
+
 			if (pthread_create(&errorLog_pid, NULL, FaultLogModule, NULL) == -1)
 			{
-				/* log_error("create %s module fail, error info:%s\n", info->moduleName, strerror(errno)); */
 //				ERR("create module fail, error info:{}", /*info->moduleName, */strerror(errno));
 				exit(1);
 			}
 			pthread_detach(0);
-
+		}
+		~errorLog()
+		{
+            pthread_exit(NULL);
 		}
 
         static void ItsWriteFaultLog(unsigned int type,unsigned int value)//(FaultLogType type, int value)
         {
-
             struct msgbuf msg;
             msg.msgflag = WRITE_FAULT_LOG;
-            msg.nType   = type;
+
+            msg.nNumber = _nextSeq;
             msg.nTime   = time(NULL);
+            msg.nType   = type;
             msg.nValue  = value;
-            msg.nNumber = _nNumber;	//序列号
-            _nNumber++;
+
+            _nextSeq++;
             if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
             {
-//			log_error("send write fault log msg fail, errno info: %s", strerror(errno));
+            int uerr  = errno;
 //          ERR("send write fault log msg fail, errno info: {}", strerror(errno));
             }
         }
 
-std::vector<FaultLogInfo> ItsReadFaultLog(const time_t startTM, const time_t endTM)
-{
-
-
-    FaultLogInfo get;
-    get.nTime = startTM;
-
-    std::vector<FaultLogInfo> rlt;
-//    rlt.push(get);
-
-/*
-	struct msgbuf msg;
-	FaultLogInfo zero;	//表明上载故障日志出错，默认应答回复1个空的故障日志
-
-	if (netArg == NULL || func == NULL)
-		return;
-	if (netArgSize > MSGSIZE - sizeof(struct faultLogMsg))
-	{
-		ERR("network arguments size exceed msg space");
-		memset(&zero, 0, sizeof(FaultLogInfo));
-		func(netArg, &zero, sizeof(FaultLogInfo));
-	}
-	else
-	{
-		memset(&msg, 0, sizeof(msg));
-		msg.mtype = MSG_FAULT_LOG;
-		msg.msgFLrwflag = READ_FAULT_LOG;
-		msg.msgFLstartLine = startLine;
-		msg.msgFLlineNum = lineNum;
-		msg.msgFLfunc = func;
-		memcpy(msg.msgFLnetArg, netArg, netArgSize);
-		if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
-			log_error("send read fault log msg fail, errno info: %s", strerror(errno));
-	}
-
-}
+        static bool ItsReadFaultLog(const time_t startTM,const time_t endTM,std::vector<hik::FaultLogInfo> &rlt)
+        {
+            FaultLogInfo get;
+//            std::vector<FaultLogInfo> rlt;
+            int startTM_tmp = time(NULL);
+            printf("startTM = %d\n",startTM_tmp);
+            for(int i = 1;i < FAULT_LOG_MAX_NUM;i++)
+            {
+ /*               if((*pMap).nNumber == 0)
+                {
+//                   break;
+//                return false;
+                    continue;
+                }
 */
-	static void *FaultLogModule(void *arg)
+                if(((*(pMap+i)).nTime) <= startTM_tmp)
+                {
+                    get.nNumber = (*(pMap+i)).nNumber ;
+                    get.nTime = (*(pMap+i)).nTime ;
+                    get.nType = (*(pMap+i)).nType ;
+                    get.nValue = (*(pMap+i)).nValue ;
+                    printf("push [[ seq:%d,nTime:%d,key:%d,value:%d ]]\n",(*(pMap+i)).nNumber,(*(pMap+i)).nTime,(*(pMap+i)).nType,(*(pMap+i)).nValue);
+                    rlt.push_back(get);
+                }
+            }
+            return true;
+        }
+
+    static void *FaultLogModule(void *arg)
 	{
 		struct msgbuf msg;
-		/* struct FaultLogInfo msg; */
-        int fd = open(FAULT_LOG_FILE, O_RDWR | O_APPEND | O_CREAT, 0666);
-		int totalsize = sizeof(FaultLogHead) + FAULT_LOG_MAX_SIZE;
-		FaultLogHead tmp, *head = NULL;
-		FaultLogInfo *info = NULL;
 
+        int fd = open(FAULT_LOG_FILE, O_RDWR | O_APPEND | O_CREAT, 0666);
+        FaultLogHead head;
+        int mNub = 0;
 		if (fd == -1)
 		{
-			/* log_error("open %s fail, error info: %s", FAULT_LOG_FILE, strerror(errno)); */
-//			ERR("open {} fail, error info: {}", FAULT_LOG_FILE, strerror(errno));
+//			ERR("open {} fail, error finfo: {}", FAULT_LOG_FILE, strerror(errno));
 			pthread_exit(NULL);
 		}
-
-		tmp.num = 0;
-		read(fd, &tmp, sizeof(tmp));
-		if (tmp.num == 0)
+        head.nowSeq = 0;
+		read(fd, &head, sizeof(FaultLogHead));
+		if (head.nowSeq == 0)
 		{
-			ftruncate(fd, totalsize);
+			ftruncate(fd, FAULT_LOG_MAX_SIZE);
         }
-		else
+        _nextSeq = head.nowSeq + 1;    //the number of fault log
+
+		pMap = (FaultLogInfo *)mmap(NULL, FAULT_LOG_MAX_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+/*		unsigned int t = 0;
+		unsigned int maxseq = 0;
+		for(int i = 0;i < FAULT_LOG_MAX_NUM;i++)
 		{
-			/* INFO("the number of fault log is %d", tmp.num); */
-//			INFO("the number of fault log is {}", tmp.num);
+            if((*(pMap+i)).nNumber == 0)
+            {
+                break;
+            }
+            t = (*(pMap + i)).nNumber;
+            maxseq = maxseq < t? t : maxseq;
 		}
-		head = (FaultLogHead *)mmap(NULL, totalsize, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-		if (head == MAP_FAILED)
+        printf("the number of fault log is {%d}\n", maxseq);
+        _nNumber = maxseq;
+*/
+		if (pMap == MAP_FAILED)
 		{
-			/* log_error("mmap %s fail, error info: %s", FAULT_LOG_FILE, strerror(errno)); */
 //			ERR("mmap {} fail, error info: {}",FAULT_LOG_FILE, strerror(errno));
 			close(fd);
 			pthread_exit(NULL);
 		}
-		head->num = tmp.num;
-		memset(&msg, 0, sizeof(msg));
+        key_t key = ftok("/dev/null", 1234);
+        if((msgid = msgget(key, IPC_CREAT | 0666)) == -1)
+        {
+            int uerrno = errno;
+            exit(EXIT_FAILURE);
+        }
+        memset(&msg, 0, sizeof(msg));
 		while (1)
 		{
+
 			if (-1 == msgrcv(msgid, &msg, MSGSIZE, MSG_FAULT_LOG, 0))
 			{
-				usleep(100000);
+				usleep(100000);//0.1s
 				continue;
 			}
+
 			if (msg.msgflag == WRITE_FAULT_LOG)
 			{
+                head.nowSeq ++;
+                head.refreshNub = _nextSeq / FAULT_LOG_MAX_NUM;
+                (*pMap).nNumber = head.nowSeq;
+                (*pMap).nTime = head.refreshNub;
+                mNub = (_nextSeq % FAULT_LOG_MAX_NUM) + 1;
 
-				if(( (head->num)+ 1) > FAULT_LOG_MAX_NUM)
-					)				{head->num = 0;	}//写到文件末尾了重头覆盖
-//				info = head->data + head->num;
-				info->nNumber = msg.nNumber;
-				info->nType = msg.nType;
-				info->nTime = msg.nTime;
-				info->nValue = msg.nValue;
-				head->num++;
-				msync(info, sizeof(FaultLogInfo), MS_ASYNC);//内存与文件同步
-//				msync(head, sizeof(head->num), MS_ASYNC);
+				(*(pMap+mNub)).nNumber = msg.nNumber;
+                (*(pMap+mNub)).nTime = msg.nTime;
+                (*(pMap+mNub)).nType = msg.nType;
+                (*(pMap+mNub)).nValue = msg.nValue;
+printf("push [[ seq:%d,nTime:%d,key:%d,value:%d ]]\n",(*(pMap+mNub)).nNumber,(*(pMap+mNub)).nTime,(*(pMap+mNub)).nType,(*(pMap+mNub)).nValue);
+
+				msync(pMap,(_nextSeq*sizeof(FaultLogInfo)), MS_ASYNC);
 			}
 			else if (msg.msgflag == READ_FAULT_LOG)
             {
 				/* UploadFaultLogDeal(&msg, head); */
 			}
-			else if (msg.msgflag == CLEAR_FAULT_LOG)
-			{
-				memset(head, 0, totalsize);
-			}
+
 		}
 	}
 		/* void write(event_enum eventkey, const int value); */
@@ -221,9 +237,11 @@ std::vector<FaultLogInfo> ItsReadFaultLog(const time_t startTM, const time_t end
 		//std::vector<FaultLog> read(const time_t start, const time_t end);
 		//string read(const time_t start, const time_t end);//查询指定日期范围内的小日志记录.
 
-        static unsigned int _nNumber;//序列号
+
 	};
-    unsigned int errorLog::_nNumber;
+	 unsigned int errorLog::_nextSeq;
+	 FaultLogInfo * errorLog::pMap;
+
 
 	class log
 	{
@@ -231,59 +249,64 @@ std::vector<FaultLogInfo> ItsReadFaultLog(const time_t startTM, const time_t end
 		log()
 		{
             //file_logger = spdlog::rotating_logger_mt("file_logger", "small_log", 1048576 * 5, 3);
-            file_logger = spdlog::daily_logger_mt("file_logger", "daily", 0, 1);
-            file_logger->info("this is start");
+            file_logger = spdlog::daily_logger_mt("file_logger", "daily", 0, 0);
 		}
 
-    /*
-    void initlog()
-    {
-        //file_logger = spdlog::rotating_logger_mt("file_logger", "small_log", 1048576 * 5, 3);
-        file_logger = spdlog::daily_logger_mt("daily_logger", "daily", 0, 1);
-		file_logger->info("this is start");
-    }
-    */
+
 		template < typename... Args>
 		static void trace(const std::string& module, const char* fmt, Args&&... args)
 		{
-			file_logger->trace(fmt,args...);
+			_file_logger->trace(fmt,args...);
 		}
 		template < typename... Args>
 		static void debug(const std::string& module, const char* fmt, Args&&... args)
 		{
-			file_logger->debug(fmt,args...);
+			_file_logger->debug(fmt,args...);
 		}
 		template < typename... Args>
 		static void info(const std::string& module, const char* fmt, Args&&... args)
         {
-			file_logger->info(fmt,args...);
+			_file_logger->info(fmt,args...);
 		}
 		template < typename... Args>
 		static void warn(const std::string& module, const char* fmt, Args&&... args)
 		{
-            file_logger->warn(fmt,args...);
+            _file_logger->warn(fmt,args...);
 		}
 		template < typename... Args>
 		static void error(const std::string& module, const char* fmt, Args&&... args)
 		{
-            file_logger->error(fmt,args...);
+            _file_logger->error(fmt,args...);
 		}
 		template< typename... Args>
 		static void fatal(const std::string& module, const char* fmt, Args&&... args)
         {
-            file_logger->critical(fmt,args...);
+            _file_logger->critical(fmt,args...);
 		}
-		static std::shared_ptr<spdlog::logger> file_logger;
+		static std::shared_ptr<spdlog::logger> _file_logger;
+        static pthread_once_t _once;
     private:
         std::string _base_filename;
         std::size_t _max_size;
         std::size_t _max_files;
         std::size_t _current_size;
-		std::string _pattern = "[ %Y-%m-%d %H:%M:%S.%e %l ]";
+        std::string _pattern = "[ %Y-%m-%d %H:%M:%S.%e %l ]";
+public:
+ /*   static std::shared_ptr<spdlog::logger> loggerfile()
+    {
+        pthread_once(&_once, log::init);
+        return _file_logger;
+    }
 
+    static void init()
+    {
+        while (!_file_logger) _file_logger = spdlog::daily_logger_mt("file_logger", "daily", 0, 1);
+    }
 
+*/
 	};
-		 std::shared_ptr<spdlog::logger> log::file_logger;
+        std::shared_ptr<spdlog::logger> log::_file_logger;
+//        pthread_once_t  log::_once = PTHREAD_ONCE_INIT;
 
 }
 
