@@ -38,11 +38,6 @@
 #define READ_FAULT_LOG	1
 #define WRITE_FAULT_LOG	2
 #define CLEAR_FAULT_LOG	3
-#define LOG_INIT(logger_name, file_name, hour,minute) \
-    do \
-    { \
-        hik::log::loggerfile()->init(logger_name, file_name, hour,minute); \
-    } while (0)
 
 /* #pragma comment(lib,"pthreadVC2.lib")  */
 
@@ -119,7 +114,6 @@ namespace hik
             _nextSeq++;
             if (msgsnd(msgid, &msg, MSGSIZE, IPC_NOWAIT) != 0)
             {
-            int uerr  = errno;
 //          ERR("send write fault log msg fail, errno info: {}", strerror(errno));
             }
         }
@@ -128,9 +122,9 @@ namespace hik
         {
             FaultLogInfo get;
 //            std::vector<FaultLogInfo> rlt;
-            int startTM_tmp = time(NULL);
+            unsigned int startTM_tmp = time(NULL);
             printf("startTM = %d\n",startTM_tmp);
-            for(int i = 1;i < FAULT_LOG_MAX_NUM;i++)
+            for(unsigned int i = 1;i < FAULT_LOG_MAX_NUM;i++)
             {
  /*               if((*pMap).nNumber == 0)
                 {
@@ -196,7 +190,6 @@ namespace hik
         key_t key = ftok("/dev/null", 1234);
         if((msgid = msgget(key, IPC_CREAT | 0666)) == -1)
         {
-            int uerrno = errno;
             exit(EXIT_FAILURE);
         }
         memset(&msg, 0, sizeof(msg));
@@ -249,7 +242,7 @@ printf("push [[ seq:%d,nTime:%d,key:%d,value:%d ]]\n",(*(pMap+mNub)).nNumber,(*(
 		log()
 		{
             //file_logger = spdlog::rotating_logger_mt("file_logger", "small_log", 1048576 * 5, 3);
-            file_logger = spdlog::daily_logger_mt("file_logger", "daily", 0, 0);
+            _file_logger = spdlog::daily_logger_mt("file_logger", "daily", 0, 0);
 		}
 
 

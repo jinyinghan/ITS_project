@@ -40,6 +40,7 @@ struct utc_timer
         hour  = cur_tm.tm_hour;
         min  = cur_tm.tm_min;
         sec  = cur_tm.tm_sec;
+		week = cur_tm.tm_wday;
         reset_utc_fmt();
     }
 
@@ -67,6 +68,7 @@ struct utc_timer
                 day  = cur_tm.tm_mday;
                 hour = cur_tm.tm_hour;
                 min  = cur_tm.tm_min;
+				week = cur_tm.tm_wday;
                 //reformat utc format
                 reset_utc_fmt();
             }
@@ -79,7 +81,7 @@ struct utc_timer
         return tv.tv_sec;
     }
 
-    int year, mon, day, hour, min, sec;
+    int year, mon, day, hour, min, sec, week;
     char utc_fmt[20];
 
 private:
@@ -106,20 +108,17 @@ public:
         FULL
     };
 
-    cell_buffer(uint32_t len): 
-    status(FREE), 
-    prev(NULL), 
-    next(NULL), 
-    _total_len(len), 
-    _used_len(0)
-    {
-        _data = new char[len];
-        if (!_data)
-        {
-            fprintf(stderr, "no space to allocate _data\n");
-            exit(1);
-        }
-    }
+//    cell_buffer(uint32_t len): 
+     cell_buffer(int shm_id, uint32_t len): 
+     status(FREE), 
+     shmid(shm_id), 
+     prev(NULL), 
+     prev_shmid(-1), 
+     next(NULL), 
+     next_shmid(-1), 
+     _total_len(len),
+     _used_len(0),
+     _data(NULL) { }
 
     uint32_t avail_len() const { return _total_len - _used_len; }
 
@@ -149,16 +148,19 @@ public:
     }
 
     buffer_status status;
-
+    int shmid;
     cell_buffer* prev;
+    int prev_shmid;
     cell_buffer* next;
-
+	int next_shmid;
+ 
 private:
-    cell_buffer(const cell_buffer&);
-    cell_buffer& operator=(const cell_buffer&);
+//    cell_buffer(const cell_buffer&);
+//    cell_buffer& operator=(const cell_buffer&);
 
     uint32_t _total_len;
     uint32_t _used_len;
+public:
     char* _data;
 };
 
@@ -184,11 +186,14 @@ public:
     void persist();
 
     void try_append(const char* lvl, const char* format, ...);
+	
+	static uint32_t _one_buff_len;
 
-private:
+	private:
     ring_log();
 
-    bool decis_file(int year, int mon, int day);
+//    bool decis_file(int year, int mon, int day);
+	bool decis_file(int week);
 
     ring_log(const ring_log&);
     const ring_log& operator=(const ring_log&);
@@ -197,12 +202,12 @@ private:
 
     cell_buffer* _curr_buf;
     cell_buffer* _prst_buf;
-
+	int* _prst_shmid;
     cell_buffer* last_buf;
 
     FILE* _fp;
     pid_t _pid;
-    int _year, _mon, _day, _log_cnt;
+    int _year, _mon, _day, _week, _log_cnt;
     char _prog_name[128];
     char _log_dir[512];
 
@@ -215,7 +220,7 @@ private:
     static pthread_mutex_t _mutex;
     static pthread_cond_t _cond;
 
-    static uint32_t _one_buff_len;
+//    static uint32_t _one_buff_len;
 
     //singleton
     static ring_log* _ins;
@@ -223,7 +228,7 @@ private:
 };
 
 void* be_thdo(void* args);
-
+/*
 #define LOG_MEM_SET(mem_lmt) \
     do \
     { \
@@ -237,6 +242,21 @@ void* be_thdo(void* args);
         } \
         ring_log::_one_buff_len = mem_lmt; \
     } while (0)
+*/
+#define LOG_MEM_SET(ml) \
+     do \
+      { \
+        unsigned mem_lmt = ml; \
+        if (mem_lmt < 30 * 1024 * 1024) \
+         { \
+            mem_lmt = 30 * 1024 * 1024; \
+         } \
+        else if (mem_lmt > 100 * 1024 * 1024) \
+         { \
+            mem_lmt = 100 * 1024 * 1024; \
+         } \
+         ring_log::_one_buff_len = mem_lmt; \
+     } while (0)
 
 #define LOG_INIT(log_dir, prog_name, level) \
     do \

@@ -157,7 +157,7 @@ struct default_daily_file_name_calculator
         std::tm tm = spdlog::details::os::localtime();
         std::conditional<std::is_same<filename_t::value_type, char>::value, fmt::MemoryWriter, fmt::WMemoryWriter>::type w;
   //      w.write(SPDLOG_FILENAME_T("{}_{:04d}-{:02d}-{:02d}_{:02d}-{:02d}"), basename, tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min);
-		char *week[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};		
+		const char *week[] = {"SUN","MON","TUE","WED","THU","FRI","SAT"};
 		std::string u(week[tm.tm_wday]);
 		w.write(SPDLOG_FILENAME_T("{}"), u);
 		return w.str();

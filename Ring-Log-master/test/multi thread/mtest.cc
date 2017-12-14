@@ -15,8 +15,9 @@ void* thdo(void* args)
 {
     for (int i = 0;i < 1e7; ++i)
     {
-        LOG_ERROR(" my number is my number is %d", i);
-    }
+        LOG_ERROR("my number is %d", i);
+    	sleep(1);
+	}
 }
 
 int main(int argc, char** argv)
